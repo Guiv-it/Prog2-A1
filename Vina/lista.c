@@ -7,7 +7,7 @@
 
 
 
-struct lista_t* listacria(){
+struct lista_t* lista_cria(){
   struct lista_t* aux = malloc(sizeof(struct lista_t));
   if (!aux)
     return NULL;
@@ -59,7 +59,7 @@ struct membro* lista_retira(struct lista_t* l, char nome[]){
   return temp;
 }
 
-void imprime(struct lista_t* l){ 
+void lista_imprime(struct lista_t* l){ 
   if(!l)
     return NULL;
   struct item* aux = l->ini;

@@ -25,7 +25,7 @@ struct lista_t {
   struct item* fim;
 };
 
-struct lista_t listacria(){
+struct lista_t lista_cria(){
 }
 
 void lista_insere(struct lista_t* l, struct membro* arquivo){
@@ -34,7 +34,7 @@ void lista_insere(struct lista_t* l, struct membro* arquivo){
 struct membro* lista_retira(struct lista_t* l, struct membro* arquivo){
 }
 
-void imprime(struct lista_t* l){  
+void lista_imprime(struct lista_t* l){  
 }
 
 void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destino){
