@@ -5,7 +5,7 @@
 #include "lz.h"
 #include "vina.h"
 
-/* move([u long inicio, ulong final], ulong ref) */
+/* move([ulong inicio, ulong final], ulong ref) */
 
 
 
