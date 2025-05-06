@@ -27,7 +27,7 @@ struct diretorio criadir(){
 o membro já exista no archive, ele deve ser substituído. Novos membros são
 inseridos respeitando a ordem da linha de comando, ao final do archive;*/
 void insere(){
-    
+
 }
 
 /*-i : insere/acrescenta um ou mais membros com compressão ao archive. Caso
@@ -59,7 +59,7 @@ void remove(){
 /*-c : lista o conteúdo de archive em ordem, incluindo as propriedades de
 cada membro (nome, UID, tamanho original, tamanho em disco e data de
 modificação) e sua ordem no arquivo.*/
-int main(){
+void listagem(){
 
 }
 

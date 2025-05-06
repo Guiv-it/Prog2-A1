@@ -57,8 +57,22 @@ struct membro* lista_retira(struct lista_t* l, char nome[]){
   aux->arquivo = NULL;
   free(aux);
   return temp;
-
 }
+
+void imprime(struct lista_t* l){ 
+  if(!l)
+    return NULL;
+  struct item* aux = l->ini;
+  while (aux)
+  {
+    puts(aux->arquivo->nome);
+    printf("\n UID: %f", aux->arquivo->UID);
+    printf("  Tamanho Original: %f", aux->arquivo->tam_ini);
+    printf("  Tamanho Compactado: %f", aux->arquivo->tam_atual);
+    printf("  Data de alteração: %f \n", aux->arquivo->mod_data);
+  }
+}
+
 void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destino){
 
   if((!l)||(!arquivo))
