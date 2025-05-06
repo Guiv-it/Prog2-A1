@@ -5,9 +5,15 @@
 #include "lz.h"
 #include "vina.h"
 
-/* move([ulong inicio, ulong final], ulong ref) */
+void move_bloco(long inicio, long final, long ref){
+}
 
 
+struct diretorio* criadir(){
+    struct diretorio* dir = malloc(sizeof(dir));
+    
+
+}
 
 /*-p : insere/acrescenta um ou mais membros sem compressão ao archive. Caso
 o membro já exista no archive, ele deve ser substituído. Novos membros são
