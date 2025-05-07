@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
 
 #include "lz.h"
 #include "lista.h"
-
-
 
 struct lista_t* lista_cria(){
   struct lista_t* aux = malloc(sizeof(struct lista_t));
@@ -13,6 +14,8 @@ struct lista_t* lista_cria(){
     return NULL;
   aux->ini = NULL;
   aux->fim = NULL;
+  aux->N_itens = 0;
+  aux->posi_fim = sizeof(struct diretorio);
   return aux;
 }
 
@@ -29,6 +32,8 @@ void lista_insere(struct lista_t* l, struct membro* arquivo){
     l->fim->prox = aux;
     l->fim = aux;
   }
+  l->N_itens++;
+  l->posi_fim = l->posi_fim + sizeof(struct membro);
   return;
 }
 
@@ -69,6 +74,8 @@ struct membro* lista_retira(struct lista_t* l, char nome[]){
   temp = aux->arquivo;
   aux->arquivo = NULL;
   free(aux);
+  l->N_itens--;
+  l->posi_fim = l->posi_fim - sizeof(struct membro);
   return temp;
 }
 

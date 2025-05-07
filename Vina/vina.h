@@ -1,24 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "lz.h"
 #include "lista.h"
 
 #ifndef vina
 #define vina
-
-struct diretorio{ //tamanho diretório: 24
-    FILE* dir;
-    struct lista_t* membros;
-    long tamdir;
-    long Numero_membros;
-}diretorio;
-
-struct arquivo { //tamanho arquivo: 16
-    struct diretorio* dir;
-    FILE* membro;
-}arquivo;
 
 struct diretorio* criadir(){
 }
