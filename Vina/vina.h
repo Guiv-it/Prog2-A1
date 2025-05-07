@@ -8,18 +8,22 @@
 #ifndef vina
 #define vina
 
-struct diretorio{
+struct diretorio{ //tamanho diretório: 24
     FILE* dir;
     struct lista_t* membros;
     long tamdir;
+    long Numero_membros;
 }diretorio;
 
-struct arquivo {
+struct arquivo { //tamanho arquivo: 16
     struct diretorio* dir;
     FILE* membro;
 }arquivo;
 
-struct diretorio criadir(){
+struct diretorio* criadir(){
+}
+
+void move_bloco(FILE* file, long inicio, long final, long ref){
 }
 
 /*-p : insere/acrescenta um ou mais membros sem compressão ao archive. Caso
@@ -50,7 +54,7 @@ void unpack(){
 }
 
 /*-r : remove os membros indicados de archive;*/
-void remove(){
+void remover(){
 
 }
 

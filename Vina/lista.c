@@ -32,6 +32,19 @@ void lista_insere(struct lista_t* l, struct membro* arquivo){
   return;
 }
 
+struct membro* lista_busca(struct lista_t* l, long pos){
+  
+  if(!l)
+  return NULL;
+
+  struct item* aux = l->ini;
+  struct membro* temp;
+
+  for (int i = 0; i < pos; i++){
+    aux = aux->prox;
+  }
+  return aux;
+}
 struct membro* lista_retira(struct lista_t* l, char nome[]){
 
   if(!l)
@@ -104,7 +117,7 @@ void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destin
   l->ini = aux;
 }
 
-void listadestroi(struct lista_t* l){
+void lista_destroi(struct lista_t* l){
   if (!l)
     return NULL;
   
