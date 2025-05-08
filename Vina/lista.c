@@ -25,7 +25,6 @@ struct lista_t* lista_cria(){
   aux->ini = NULL;
   aux->fim = NULL;
   aux->N_itens = 0;
-  aux->posi_fim = sizeof(struct diretorio);
   return aux;
 }
 
@@ -43,7 +42,6 @@ void lista_insere(struct lista_t* l, struct membro* arquivo){
     l->fim = aux;
   }
   l->N_itens++;
-  l->posi_fim = l->posi_fim + sizeof(struct membro);
 
   corrige_ordem(l);
   return;
@@ -112,7 +110,6 @@ struct membro* lista_retira(struct lista_t* l, char nome[]){
   free(aux);
 
   l->N_itens--;
-  l->posi_fim = l->posi_fim - sizeof(struct membro);
   corrige_ordem(l);
   return temp;
 }
