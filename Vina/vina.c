@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+//#include <unistd.h>
 
 #include "lz.h"
 #include "vina.h"
@@ -18,15 +19,14 @@ struct diretorio* criadir(){
   return archi;
 }
 
-struct membro* criamembro(FILE* file){
-    /*nome, UID, tamanho original, tamanho em disco, posição na lista e data de modificação*/
+struct membro* criamembro(FILE* file, char* nome){
     struct membro* Novo_membro = malloc(sizeof(struct membro));
     struct stat* buffer;
     int fd = fileno(file);
 
     fstat(fd, buffer);
-
-    //Novo_membro->nome = "1";
+    
+    strcpy(Novo_membro->nome, nome);
     Novo_membro->UID = buffer->st_uid;
     Novo_membro->tam_ini = buffer->st_size;
     Novo_membro->tam_atual = buffer->st_size;
@@ -50,9 +50,8 @@ struct lista_t* lista_membros(struct diretorio* dir){
 }
 
 //move o grupo de blocos que vai do "inicio" até o "final" para que seu início fique na posição ref
-void move_bloco(FILE* file, long inicio, long final, long ref){
+void move_bloco(FILE* file, long inicio, long tam, long ref){
 
-  long tam = (final - inicio);
   char *buffer = (char *)malloc(tam);
 
   fseek(file, inicio, SEEK_SET);
@@ -64,53 +63,133 @@ void move_bloco(FILE* file, long inicio, long final, long ref){
   return;
 }
 
-/*-p : insere/acrescenta um ou mais membros sem compressão ao archive. Caso
-o membro já exista no archive, ele deve ser substituído. Novos membros são
-inseridos respeitando a ordem da linha de comando, ao final do archive;*/
-void insere(struct arquivo* arquivo, FILE* N_membro){
+void insere(struct arquivo* arquivo, FILE* N_membro, char* nome){
 
-  long aumento = sizeof(struct membro);
   struct diretorio* dir = dirfetch(arquivo);
   struct lista_t* membros = lista_membros(arquivo->dir);
+  struct membro* novo = criamembro(N_membro, nome);
+
+  FILE* file = arquivo->membro;
+
+  fseek(N_membro, 0, SEEK_END);
   long tam_new_membro = ftell(N_membro);
   char* buffer = (char *)malloc(tam_new_membro);
-  FILE* file = arquivo->membro;
-  struct membro* novo = criamembro(N_membro);
+  fseek(N_membro, 0, SEEK_SET);
+  
   
   //carrega o buffer com o membro a ser inserido
   fread(buffer, tam_new_membro, 1, N_membro);
 
-  //encontra o final do arquivo após aumentar o diretório
-  fseek(file, aumento, SEEK_END);
+  //checa se é um novo arquivo ou arquivo existente
+  if (novo == lista_busca_nome(membros, nome)){
+    int posi = novo->ordem;
+    long aumento = (tam_new_membro - novo->tam_atual);
 
-  novo->posi_ini = membros->posi_fim;
-  novo->ordem = (membros->N_itens) + 1;
+    //se o arquivo não mudou de tamanho, apenas escreve por cima do arquivo;
+    if(aumento == 0){
+      fseek(file, novo->posi_ini, SEEK_SET);
+      fwrite(buffer, tam_new_membro, 1, file);
+      return;
+    }
+    //caso o arquivo mudou de tamanho, arruma a posição de todos os arquivo a sua frente
+    for (int i = membros->N_itens; i > posi ; i--){
 
-  //insere o novo membro (tamanho que o diretório aumenta) bytes após o final do arquivo 
-  fwrite(buffer, tam_new_membro, 1, file);
+      struct membro* aux;
 
-  //move os outros arquivos (tamanho que o diretório aumenta) bytes para a frente;
-  for (int i = (dir->Numero_membros); i > 0 ; i--){
+      aux = lista_busca_posi(membros, i);
 
-    struct membro* aux;
-
-    aux = lista_busca(membros, i);
-
-    long f_ini = aux->posi_ini;
-    long f_fim = (f_ini + (aux->tam_atual));
-    long f_dest = (f_ini + aumento);
+      long f_ini = aux->posi_ini;
+      long tam = (aux->tam_atual);
+      long f_dest = (f_ini + aumento);
     
-    move_bloco(file, f_ini, f_fim, f_dest);
-    aux->posi_ini = f_dest;
-  }
-      //aumenta o tamanho do diretório
+      move_bloco(file, f_ini, tam, f_dest);
+
+      aux->posi_ini = f_dest;
+    }
+    //e então se sobrescreve com a nova versão salva
+    fseek(file, novo->posi_ini, SEEK_SET);
+    fwrite(buffer, tam_new_membro, 1, file);
+  } else {
+
+    long aumento = sizeof(struct membro);
+
+    //encontra o final do arquivo após aumentar o diretório
+    novo->posi_ini = fseek(file, aumento, SEEK_END);
+
+
+    //insere o novo membro (tamanho que o diretório aumenta) bytes após o final do arquivo 
+    fwrite(buffer, tam_new_membro, 1, file);
+
+    //move os outros arquivos (tamanho que o diretório aumenta) bytes para a frente;
+    for (int i = (dir->Numero_membros); i > 0 ; i--){
+
+      struct membro* aux;
+
+      aux = lista_busca_posi(membros, i);
+
+      long f_ini = aux->posi_ini;
+      long tam = (aux->tam_atual);
+      long f_dest = (f_ini + aumento);
+    
+      move_bloco(file, f_ini, tam, f_dest);
+      aux->posi_ini = f_dest;
+    }
+    //aumenta o tamanho do diretório
     lista_insere(membros,novo);
+  }
+  return;
 }
 
 void inserecomp(){
 }
 
-void move(){
+void move(struct arquivo* arquivo, char* origem, char* destino){
+
+  struct diretorio* dir = dirfetch(arquivo);
+  struct lista_t* membros = lista_membros(arquivo->dir);
+  FILE* file = arquivo->membro;
+  struct membro* ultimo = lista_busca_posi(membros, -1);
+  long fim = (ultimo->posi_ini)+(ultimo->tam_atual);
+
+  //encontrar a origem
+  struct membro* objeto = lista_busca_nome(membros, origem);
+  int posi_inicial = objeto->ordem;
+
+  //colocar origem no fim do arquivo.
+  move_bloco(file, objeto->posi_ini,objeto->tam_atual,fim);
+
+  //encontrar o destino, se destino == "NULL" vira primeiro da fila
+  if (!strcmp("NULL", destino)){
+
+    //mover todos os blocos antes do objeto (tam do objeto) para frente
+    for(int i = (posi_inicial-1); i > 0; i--){
+      struct membro* aux = lista_busca_posi(membros, i);
+      long dest = (aux->posi_ini)+(objeto->tam_atual);
+      move_bloco(file, aux->posi_ini, aux->tam_atual, dest);
+    }
+
+    lista_move(membros, objeto, NULL);
+
+  } else { 
+    //encontrar o destino
+    struct membro* alvo = lista_busca_nome(membros, destino);
+    if (alvo->ordem < posi_inicial){
+      //move os dados entre alvo e objeto para direita (tam objeto) bytes
+    } else {
+      //move os dados entre alvo e objeto para esquerda (tam objeto) bytes
+      
+    }
+    //coloca o alvo na nova posição
+      //arruma a lista
+      //concatena o fim do arquivo
+
+  }
+
+  //colocar origem após o destino 
+
+  //arrumar fila
+
+
 
 }
 
@@ -118,10 +197,76 @@ void unpack(){
 
 }
 
-void remover(){
+/*-r : remove os membros indicados de archive;*/
+void remover(struct arquivo* arquivo, char* nome){
 
+  struct diretorio* dir = dirfetch(arquivo);
+  struct lista_t* membros = lista_membros(arquivo->dir);
+  FILE* file = arquivo->membro;
+
+  //encontrar objeto a ser removido
+  struct membro* alvo = lista_busca_nome(membros, nome);
+  int posi = alvo->ordem;
+
+  //colocar objeto no fim do arquivo
+  fseek(file, 0, SEEK_END);
+  long final = ftell(file);
+
+  move_bloco(file, alvo->posi_ini,alvo->tam_atual,final);
+
+  //arruma as posições na lista
+  struct membro* ultimo = lista_busca_posi(membros, -1);
+  lista_move(membros, alvo, ultimo);
+
+  //trazer arquivos a direita do alvo (tamanho do alvo) para esquerda
+  for(int i = posi ; i < dir->Numero_membros; i++){
+    struct membro* aux = lista_busca_posi(membros, i);
+
+    long tam = aux->tam_atual;
+    long dest = (aux->posi_ini)-(alvo->tam_atual);
+    move_bloco(file,aux->posi_ini, tam, dest);
+
+    aux->posi_ini = dest;
+  }
+
+  //remover objeto da fila
+  lista_retira(membros, nome);
+
+  //trazer arquivos (tam que o diretório diminui) para esquerda
+  long aumento = sizeof(struct membro);
+
+  for(int i = 1 ; i <= dir->Numero_membros; i++){
+
+    struct membro* aux = lista_busca_posi(membros, i);
+
+    long tam = aux->tam_atual;
+    long dest = (aux->posi_ini)-aumento;
+    move_bloco(file,aux->posi_ini, tam, dest);
+
+    aux->posi_ini = dest;
+  }
+  //diminuir o tamanho do diretório no struct
+  dir->tamdir = (dir->tamdir)-aumento;
+
+  //cortar os ultios bytes do arquivo
+  int fd = fileno(file);
+  ftruncate(fd, (ultimo->posi_ini)+(ultimo->tam_atual));
 }
 
-void listagem(){
-
+void listagem(struct arquivo* arquivo){
+  struct diretorio* dir = dirfetch(arquivo);
+  struct lista_t* membros = lista_membros(arquivo->dir);
+  FILE* file = arquivo->membro;
+  
+  for (int i = 1; i <= dir->Numero_membros; i++ ){
+    struct membro* aux = lista_busca_posi(membros, i);
+    printf("======================================\n");
+    printf("nome: %d\n", aux->nome );
+    printf("UID: %d\n", aux->UID);
+    printf("tamanaho original: %d\n", aux->tam_ini);
+    printf("tamanho em disco: %d\n", aux->tam_atual);
+    printf("data de modificação: %d\n", aux->mod_data);
+    printf("posição: %d\n", aux->ordem);
+    printf("======================================\n");
+  }
 }

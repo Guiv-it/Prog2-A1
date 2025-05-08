@@ -13,7 +13,16 @@
 struct diretorio* criadir(){
 }
 
-void move_bloco(FILE* file, long inicio, long final, long ref){
+struct membro* criamembro(FILE* file, char* nome){
+}
+
+struct diretorio* dirfetch(struct arquivo* archi){
+}
+
+struct lista_t* lista_membros(struct diretorio* dir){
+}
+
+void move_bloco(FILE* file, long inicio, long tam, long ref){
 }
 
 /*-p : insere/acrescenta um ou mais membros sem compressão ao archive. Caso
@@ -28,10 +37,10 @@ inseridos respeitando a ordem da linha de comando, ao final do archive;*/
 void inserecomp(){
 }
 
-/*-m membro : move o membro indicado na linha de comando para imediatamente
+/*-m membro : move o membro indicado na linha de comando para imediatamentWSe
 depois do membro target existente em archive. A movimentação deve ocorrer
 na seção de dados do archive;*/
-void move(){
+void move(struct arquivo* arquivo, char* origem, char* destino){
 
 }
 
@@ -40,12 +49,10 @@ indicados, todos devem ser extraídos. A extração consiste em ler o membro
 de archive e criar um arquivo correspondente, com conteúdo idêntico, em
 disco;*/
 void unpack(){
-
 }
 
 /*-r : remove os membros indicados de archive;*/
-void remover(){
-
+void remover(struct arquivo* arquivo, char* nome){
 }
 
 /*-c : lista o conteúdo de archive em ordem, incluindo as propriedades de

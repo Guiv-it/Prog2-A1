@@ -8,6 +8,16 @@
 #include "lz.h"
 #include "lista.h"
 
+void corrige_ordem(struct lista_t* l){
+  struct item* aux = l->ini;
+  int i = 1;
+  while(aux){
+    aux->arquivo->ordem = i;
+    i++;
+  }
+  return;
+}
+
 struct lista_t* lista_cria(){
   struct lista_t* aux = malloc(sizeof(struct lista_t));
   if (!aux)
@@ -34,29 +44,52 @@ void lista_insere(struct lista_t* l, struct membro* arquivo){
   }
   l->N_itens++;
   l->posi_fim = l->posi_fim + sizeof(struct membro);
+
+  corrige_ordem(l);
   return;
 }
 
-struct membro* lista_busca(struct lista_t* l, long pos){
-  
-  if(!l)
-  return NULL;
+struct membro* lista_busca_nome(struct lista_t* l, char* nome){
+  if(!l){
+    return NULL;
+  }
+  if(!nome){
+    return NULL;
+  }
 
   struct item* aux = l->ini;
   struct membro* temp;
 
-  for (int i = 0; i < pos; i++){
+  while(aux->prox){
+    if((strcmp(aux->arquivo->nome, nome)) == 0)
+      return aux->arquivo;
+    aux = aux->prox;
+  }
+  return NULL;
+}
+
+struct membro* lista_busca_posi(struct lista_t* l, long pos){
+  if(!l)
+    return NULL;
+
+  struct item* aux = l->ini;
+
+  if (pos == -1)
+    return l->fim;
+
+  for (int i = 1; i < pos; i++){
     aux = aux->prox;
   }
   return aux;
 }
+
 struct membro* lista_retira(struct lista_t* l, char nome[]){
 
   if(!l)
     return NULL;
   
   struct item* aux = l->ini;
-  struct item* corrige;
+  struct item* corrige = l->ini;
   struct membro* temp;
 
   while((aux)&&(strcmp(nome,aux->arquivo->nome)) != 0){
@@ -71,11 +104,16 @@ struct membro* lista_retira(struct lista_t* l, char nome[]){
     l->fim = corrige; 
   }
   corrige->prox = aux->prox;
+  while(corrige->prox){
+    corrige=corrige->prox;
+  }
   temp = aux->arquivo;
   aux->arquivo = NULL;
   free(aux);
+
   l->N_itens--;
   l->posi_fim = l->posi_fim - sizeof(struct membro);
+  corrige_ordem(l);
   return temp;
 }
 
@@ -122,6 +160,8 @@ void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destin
   }
   aux->prox = l->ini;
   l->ini = aux;
+  corrige_ordem(l);
+  return;
 }
 
 void lista_destroi(struct lista_t* l){
