@@ -56,7 +56,6 @@ struct membro* lista_busca_nome(struct lista_t* l, char* nome){
   }
 
   struct item* aux = l->ini;
-  struct membro* temp;
 
   while(aux->prox){
     if((strcmp(aux->arquivo->nome, nome)) == 0)
@@ -73,12 +72,12 @@ struct membro* lista_busca_posi(struct lista_t* l, long pos){
   struct item* aux = l->ini;
 
   if (pos == -1)
-    return l->fim;
+    return l->fim->arquivo;
 
   for (int i = 1; i < pos; i++){
     aux = aux->prox;
   }
-  return aux;
+  return aux->arquivo;
 }
 
 struct membro* lista_retira(struct lista_t* l, char nome[]){
@@ -96,9 +95,9 @@ struct membro* lista_retira(struct lista_t* l, char nome[]){
   }
   if(!aux)
     return NULL;
-  if (aux = l->ini){
+  if (aux == l->ini){
     l->ini = aux->prox;
-  } else if(aux = l->fim) {
+  } else if(aux == l->fim) {
     l->fim = corrige; 
   }
   corrige->prox = aux->prox;
@@ -116,22 +115,22 @@ struct membro* lista_retira(struct lista_t* l, char nome[]){
 
 void lista_imprime(struct lista_t* l){ 
   if(!l)
-    return NULL;
+    return;
   struct item* aux = l->ini;
   while (aux)
   {
     puts(aux->arquivo->nome);
-    printf("\n UID: %f", aux->arquivo->UID);
-    printf("  Tamanho Original: %f", aux->arquivo->tam_ini);
-    printf("  Tamanho Compactado: %f", aux->arquivo->tam_atual);
-    printf("  Data de alteração: %f \n", aux->arquivo->mod_data);
+    printf("\n UID: %d", aux->arquivo->UID);
+    printf("  Tamanho Original: %ld", aux->arquivo->tam_ini);
+    printf("  Tamanho Compactado: %ld", aux->arquivo->tam_atual);
+    printf("  Data de alteração: %ld \n", aux->arquivo->mod_data);
   }
 }
 
 void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destino){
 
   if((!l)||(!arquivo))
-    return NULL;
+    return;
 
   struct item* aux = l->ini;
   struct item* temp = l->ini;
@@ -143,7 +142,7 @@ void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destin
   if (!aux)
     return;
   temp->prox = aux->prox;
-  if (aux->prox = NULL)
+  if (aux->prox == NULL)
     l->fim = temp;
   temp = l->ini;
   if (destino){
@@ -163,7 +162,7 @@ void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destin
 
 void lista_destroi(struct lista_t* l){
   if (!l)
-    return NULL;
+    return;
   
   struct item* aux = l->ini;
   struct item* retira = l->ini;

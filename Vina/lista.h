@@ -32,9 +32,9 @@ struct lista_t { //tamanho lista_t: 24
 };
 
 struct diretorio{ //tamanho diretório: 32
+  long tamdir;
   FILE* dir;
   struct lista_t* membros;
-  long tamdir;
   long Numero_membros;
 };
 
@@ -43,28 +43,19 @@ struct arquivo { //tamanho arquivo: 16
   FILE* membro;
 };
 
-struct lista_t* lista_cria(){
-}
+struct lista_t* lista_cria();
 
-void lista_insere(struct lista_t* l, struct membro* arquivo){
-}
+void lista_insere(struct lista_t* l, struct membro* arquivo);
 
-struct membro* lista_busca_nome(struct lista_t* l, char* nome){
-}
+struct membro* lista_busca_nome(struct lista_t* l, char* nome);
 
-struct membro* lista_busca_posi(struct lista_t* l, long pos){
-}
+struct membro* lista_busca_posi(struct lista_t* l, long pos);
 
-struct membro* lista_retira(struct lista_t* l, char nome[]){
-}
+struct membro* lista_retira(struct lista_t* l, char nome[]);
 
-void lista_imprime(struct lista_t* l){  
-}
+void lista_imprime(struct lista_t* l);
 
-void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destino){
-}
+void lista_move(struct lista_t* l, struct membro* arquivo, struct membro* destino);
 
-void lista_destroi(struct lista_t* l){
-}
-
+void lista_destroi(struct lista_t* l);
 #endif
