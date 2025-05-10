@@ -5,8 +5,9 @@
 struct diretorio criadir(){
   struct diretorio archi;
 
-  archi.membros = lista_cria();
   archi.tamdir=sizeof(struct diretorio);
+  archi.membros = lista_cria();
+  
 
   return archi;
 }

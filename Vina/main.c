@@ -1,6 +1,7 @@
 #include <getopt.h>
 
 #include "vina.h"
+
 void CriaArquivo(char* name)
 {
     FILE* arquivo;
@@ -16,7 +17,7 @@ void CriaArquivo(char* name)
     
     //Colocando o diretorio no arquivo
     
-    fwrite(&dir, 1, sizeof(struct diretorio), arquivo);
+    fwrite(&dir, 1, sizeof(long), arquivo);
 }
 
 
