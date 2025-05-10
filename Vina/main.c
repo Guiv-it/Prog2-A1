@@ -22,16 +22,16 @@ void CriaArquivo(char* name)
 
 
 int main(int argc, char *argv[]){
-  //int funct;
-  //getopt(argc, argv, ":p:i:m:x:r:c");
-  //char* arq_nome = calloc(1024, sizeof(char));
+  int funct;
+  getopt(argc, argv, ":p:i:m:x:r:c");
+  char* arq_nome = calloc(1024, sizeof(char));
   FILE* arquivo_bin;
   FILE* arquivo;
   int tam;
 
 
   CriaArquivo("Josias");
-  /*arquivo_bin = fopen("Josias", "ab+");
+  arquivo_bin = fopen("Josias", "ab+");
 
   strcpy(arq_nome, "teste.txt");
   arquivo = fopen("teste.txt", "ab+");
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
 
   insere(arquivo_bin, arquivo, arq_nome, tam);
 
-  fclose(arquivo);
+  /*fclose(arquivo);
   fclose(arquivo_bin);*/
   return 0;
   /*arq_nome = strdup(optarg); 
