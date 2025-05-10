@@ -1,4 +1,4 @@
-//#include <getopt.h>
+#include <getopt.h>
 
 #include "vina.h"
 void CriaArquivo(char* name)

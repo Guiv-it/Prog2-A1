@@ -1,5 +1,6 @@
 {
   "files.associations": {
-    "lz.h": "c"
+    "lz.h": "c",
+    "vina.h": "c"
   }
 }
