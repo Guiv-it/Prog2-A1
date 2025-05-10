@@ -10,9 +10,7 @@
 
 struct diretorio criadir(){
   struct diretorio archi;
-  FILE* algo = malloc(sizeof(FILE));
 
-  archi.dir = algo;
   archi.membros = lista_cria();
   archi.tamdir=sizeof(struct diretorio);
 

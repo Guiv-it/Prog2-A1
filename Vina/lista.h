@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 
 
@@ -35,7 +35,6 @@ struct lista_t { //tamanho lista_t: 24
 
 struct diretorio{ //tamanho diretório: 32
   long tamdir;
-  FILE* dir;
   struct lista_t* membros;
   long Numero_membros;
 };
