@@ -165,7 +165,6 @@ void inserecomp(FILE* file, FILE* N_membro, char* nome){
 
   FILE* N_membro_c = fopen(c_nome, "wb+");
   fwrite(buffer_o, tam_c, 1, N_membro_c);
-  fclose(N_membro_c);
 
   //checa se o arquivo é maior que a sua versão compactada
   if (tam_new_membro > tam_c){
@@ -173,7 +172,7 @@ void inserecomp(FILE* file, FILE* N_membro, char* nome){
   } else { //se o arquivo compactado for maior ou igual ao arquivo sem compactação
     insere(file, N_membro, nome, tam_new_membro);
   }
-
+  fclose(N_membro_c);
 }
 
 void move(FILE* file, char* origem, char* destino){
