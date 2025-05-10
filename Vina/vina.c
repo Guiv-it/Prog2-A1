@@ -8,13 +8,13 @@
 #include "lz.h"
 #include "vina.h"
 
-struct diretorio* criadir(){
-  struct diretorio* archi = malloc(sizeof(struct diretorio));
+struct diretorio criadir(){
+  struct diretorio archi;
   FILE* algo = malloc(sizeof(FILE));
 
-  archi->dir = algo;
-  archi->membros = lista_cria();
-  archi->tamdir=sizeof(struct diretorio);
+  archi.dir = algo;
+  archi.membros = lista_cria();
+  archi.tamdir=sizeof(struct diretorio);
 
   return archi;
 }
@@ -37,10 +37,11 @@ struct membro* criamembro(FILE* file, char* nome){
     return Novo_membro;
 }
 
-struct diretorio* dirfetch(struct arquivo* archi){
-  if(!archi)
-    return NULL;
-  return archi->dir;
+struct diretorio* dirfetch(FILE* archi){
+  fseek(archi,0,SEEK_SET);
+  struct diretorio* dir = calloc(1, sizeof(dir));
+  fread(dir, sizeof(struct diretorio), 1, archi);
+  return dir;
 }
 
 struct lista_t* lista_membros(struct diretorio* dir){
@@ -63,13 +64,11 @@ void move_bloco(FILE* file, long inicio, long tam, long ref){
   return;
 }
 
-void insere(struct arquivo* arquivo, FILE* N_membro, char* nome, long tam_c){
+void insere(FILE* file, FILE* N_membro, char* nome, long tam_c){
 
-  struct diretorio* dir = dirfetch(arquivo);
-  struct lista_t* membros = lista_membros(arquivo->dir);
+  struct diretorio* dir = dirfetch(file);
+  struct lista_t* membros = lista_membros(dir);
   struct membro* novo = criamembro(N_membro, nome);
-
-  FILE* file = arquivo->membro;
 
   fseek(N_membro, 0, SEEK_END);
   long tam_new_membro = ftell(N_membro);
@@ -113,9 +112,12 @@ void insere(struct arquivo* arquivo, FILE* N_membro, char* nome, long tam_c){
   } else {
 
     long aumento = sizeof(struct membro);
-
+    char* expandir = (char *)calloc(1, aumento);
     //encontra o final do arquivo após aumentar o diretório
-    novo->posi_ini = fseek(file, aumento, SEEK_END);
+
+    novo->posi_ini = fseek(file, 0, SEEK_END);
+    fwrite(expandir, aumento, 1, file);
+    fwrite(buffer, aumento, 1, file);
 
 
     //insere o novo membro (tamanho que o diretório aumenta) bytes após o final do arquivo 
@@ -141,18 +143,18 @@ void insere(struct arquivo* arquivo, FILE* N_membro, char* nome, long tam_c){
   return;
 }
 
-void inserecomp(struct arquivo* arquivo, FILE* N_membro, char* nome){
+void inserecomp(FILE* file, FILE* N_membro, char* nome){
 
   fseek(N_membro, 0, SEEK_END);
   long tam_new_membro = ftell(N_membro);
-  char* buffer_i = (char *)malloc(tam_new_membro);
+  unsigned char* buffer_i = ( unsigned char *)malloc(tam_new_membro);
   fseek(N_membro, 0, SEEK_SET);
 
   //carregar Buffer_in
   fread(buffer_i, tam_new_membro, 1, N_membro);
 
   //criar Buffer_out
-  char* buffer_o =(char *)malloc(tam_new_membro * 1.004 + 1);
+   unsigned char* buffer_o =( unsigned char *)malloc(tam_new_membro * 1.004 + 1);
 
   //comprime arquivo 
   int tam_c = LZ_Compress(buffer_i, buffer_o, tam_new_membro);
@@ -167,38 +169,17 @@ void inserecomp(struct arquivo* arquivo, FILE* N_membro, char* nome){
 
   //checa se o arquivo é maior que a sua versão compactada
   if (tam_new_membro > tam_c){
-    insere(arquivo, N_membro_c, nome, tam_c);
+    insere(file, N_membro_c, nome, tam_c);
   } else { //se o arquivo compactado for maior ou igual ao arquivo sem compactação
-    insere(arquivo, N_membro, nome, tam_new_membro);
+    insere(file, N_membro, nome, tam_new_membro);
   }
-  
-  //carrega o buffer com o membro a ser inserido
-
-  //checa se é um novo arquivo ou arquivo existente
-
-    //se o arquivo não mudou de tamanho, apenas escreve por cima do arquivo;
-
-    //caso o arquivo mudou de tamanho, arruma a posição de todos os arquivo a sua frente
-    
-    //e então se sobrescreve com a nova versão salva
-
-  //senão
-
-    //encontra o final do arquivo após aumentar o diretório
-
-    //insere o novo membro (tamanho que o diretório aumenta) bytes após o final do arquivo 
-
-    //move os outros arquivos (tamanho que o diretório aumenta) bytes para a frente;
-
-    //aumenta o tamanho do diretório
 
 }
 
-void move(struct arquivo* arquivo, char* origem, char* destino){
+void move(FILE* file, char* origem, char* destino){
 
-  struct diretorio* dir = dirfetch(arquivo);
-  struct lista_t* membros = lista_membros(arquivo->dir);
-  FILE* file = arquivo->membro;
+  struct diretorio* dir = dirfetch(file);
+  struct lista_t* membros = lista_membros(dir);
   struct membro* ultimo = lista_busca_posi(membros, -1);
   long fim = (ultimo->posi_ini)+(ultimo->tam_atual);
 
@@ -264,22 +245,21 @@ void move(struct arquivo* arquivo, char* origem, char* destino){
   ftruncate(fileno(file), fim);
 }
 
-/*FILE* extrai(struct arquivo* arquivo, char* nome){
-  struct diretorio* dir = dirfetch(arquivo);
-  struct lista_t* membros = lista_membros(arquivo->dir);
-  FILE* file = arquivo->membro;
+/*void extrai(FILE* file, char* nome){
+  struct diretorio* dir = dirfetch(file);
+  struct lista_t* membros = lista_membros(dir);
   struct membro* ultimo = lista_busca_posi(membros, -1);
+
   long fim = (ultimo->posi_ini)+(ultimo->tam_atual);
 
   return file;
 }*/
 
 /*-r : remove os membros indicados de archive;*/
-void remover(struct arquivo* arquivo, char* nome){
+void remover(FILE* file, char* nome){
 
-  struct diretorio* dir = dirfetch(arquivo);
-  struct lista_t* membros = lista_membros(arquivo->dir);
-  FILE* file = arquivo->membro;
+  struct diretorio* dir = dirfetch(file);
+  struct lista_t* membros = lista_membros(dir);
 
   //encontrar objeto a ser removido
   struct membro* alvo = lista_busca_nome(membros, nome);
@@ -329,9 +309,9 @@ void remover(struct arquivo* arquivo, char* nome){
   ftruncate(fileno(file), (ultimo->posi_ini)+(ultimo->tam_atual));
 }
 
-void listagem(struct arquivo* arquivo){
-  struct diretorio* dir = dirfetch(arquivo);
-  struct lista_t* membros = lista_membros(arquivo->dir);
+void listagem(FILE* file){
+  struct diretorio* dir = dirfetch(file);
+  struct lista_t* membros = lista_membros(dir);
   
   for (int i = 1; i <= dir->Numero_membros; i++ ){
     struct membro* aux = lista_busca_posi(membros, i);

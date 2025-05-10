@@ -1,3 +1,6 @@
+#ifndef lista
+#define lista
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,8 +9,7 @@
 #include <time.h>
 //#include <unistd.h>
 
-#ifndef lista
-#define lista
+
 
 struct membro{  //tamanho membro: 1072
   /*nome, UID, tamanho original, tamanho em disco e data de modificação*/
@@ -36,11 +38,6 @@ struct diretorio{ //tamanho diretório: 32
   FILE* dir;
   struct lista_t* membros;
   long Numero_membros;
-};
-
-struct arquivo { //tamanho arquivo: 16
-  struct diretorio* dir;
-  FILE* membro;
 };
 
 struct lista_t* lista_cria();
