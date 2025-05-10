@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
 
 
   CriaArquivo("Josias");
-  arquivo_bin = fopen("Josias", "ab+");
+  /*arquivo_bin = fopen("Josias", "ab+");
 
   strcpy(arq_nome, "teste.txt");
   arquivo = fopen("teste.txt", "ab+");
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
   insere(arquivo_bin, arquivo, arq_nome, tam);
 
   fclose(arquivo);
-  fclose(arquivo_bin);
+  fclose(arquivo_bin);*/
   return 0;
   /*arq_nome = strdup(optarg); 
   if(arq_nome == NULL){
