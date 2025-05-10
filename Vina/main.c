@@ -24,7 +24,7 @@ void CriaArquivo(char* name)
 int main(int argc, char *argv[]){
   //int funct;
   //getopt(argc, argv, ":p:i:m:x:r:c");
-  char* arq_nome = calloc(1024, sizeof(char));
+  //char* arq_nome = calloc(1024, sizeof(char));
   FILE* arquivo_bin;
   FILE* arquivo;
   int tam;

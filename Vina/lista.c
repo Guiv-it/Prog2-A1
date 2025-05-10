@@ -22,9 +22,11 @@ struct lista_t* lista_cria(){
   struct lista_t* aux = malloc(sizeof(struct lista_t));
   if (!aux)
     return NULL;
+    
   aux->ini = NULL;
   aux->fim = NULL;
   aux->N_itens = 0;
+
   return aux;
 }
 
