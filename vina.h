@@ -32,7 +32,7 @@ struct diretorio{ //tamanho diretório: 32
 
 struct diretorio criadir();
 
-struct membro criamembro(FILE* file, char* nome);
+struct membro criamembro(char* nome);
 
 struct diretorio* dirfetch(FILE* file);
 
@@ -45,7 +45,7 @@ void move_bloco(FILE* file, long inicio, long tam, long ref);
 /*-p : insere/acrescenta um ou mais membros sem compressão ao archive. Caso
 o membro já exista no archive, ele deve ser substituído. Novos membros são
 inseridos respeitando a ordem da linha de comando, ao final do archive;*/
-void insere(FILE* file, FILE* N_membro, char* nome, long tam_c);
+void insere(FILE* file, char* N_membro, char* nome,long tam_ini, long tam_c);
 
 /*-i : insere/acrescenta um ou mais membros com compressão ao archive. Caso
 o membro já exista no archive, ele deve ser substituído. Novos membros são

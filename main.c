@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
   char* nome_b;
   FILE* arquivo_b;
   FILE* arquivo_novo;
-  
+
   while ((opçao = getopt(argc, argv, ":p:i:m:x:r:c"))!= -1){
     switch (opçao)
     {
@@ -62,9 +62,13 @@ int main(int argc, char *argv[]){
           arquivo_novo = fopen(nome_novo, "r");
           fseek(arquivo_novo, 0, SEEK_END);
           long tam = ftell(arquivo_novo);
-          fseek(arquivo_novo, 0, SEEK_SET);
+          char* buffer = (char*)malloc(tam);
 
-          insere(arquivo_b, arquivo_novo, nome_novo, tam);
+
+          fseek(arquivo_novo, 0, SEEK_SET);
+          fread(buffer, tam, 1, arquivo_novo);
+
+          insere(arquivo_b, buffer, nome_novo, tam, tam);
           fclose(arquivo_novo);
           optind++;
         }
@@ -95,7 +99,7 @@ int main(int argc, char *argv[]){
         } 
       break;
       case 'm':
-
+      fprintf(stderr, "movendo\n");
         nome_b = strdup(optarg);
 
         if(access(nome_b, F_OK) == -1){
@@ -106,16 +110,12 @@ int main(int argc, char *argv[]){
 
         char objeto[1024];
         char alvo[1024];
-
-        fprintf(stderr, "argv[optind] %s\n", argv[optind]);
-        fprintf(stderr, "argc %d\n", argc);
       
         strncpy(objeto, argv[optind], sizeof(objeto)-1);
         optind++;
         if (argc == 4){
           move(arquivo_b,objeto, NULL);
         } else {
-        fprintf(stderr, "argv[optind] %s", argv[optind]);
         strncpy(alvo, argv[optind], sizeof(alvo)-1);
       
         move(arquivo_b,objeto, alvo);}
@@ -140,6 +140,8 @@ int main(int argc, char *argv[]){
             char nome_ext[1024];
 
             strncpy(nome_ext, argv[optind], sizeof(nome_ext)-1);
+
+            printf("descompactando: %s\n", nome_ext);
 
             extrai(arquivo_b, nome_ext);
             optind++;

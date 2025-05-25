@@ -1,8 +1,5 @@
 all: main.c vina.c vina.h lz.c lz.h
-	gcc -Wall -g -Wextra main.c vina.c lz.c -o Vinac
-
-Valgrind: main.c vina.c vina.h lz.c lz.h
-	valgring -Wall main.c vina.c lz.c -o Vinac
+	gcc -Wall -g -Wextra main.c vina.c lz.c -o vinac
 
 clean:
-	-rm -f *~ *.o *.out Vinac *.vc
+	-rm -f *~ *.o *.out Vinac *.vc *.lz
